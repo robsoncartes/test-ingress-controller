@@ -6,22 +6,10 @@ metadata:
     app: app-1
 spec:
   containers:
-  - name: app-1
-    image: hashicorp/http-echo:0.2.3
-    args:
-    - "-text=Executando APP-1"
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: app1-service
-spec:
-  selector:
-    app: app-1
-  ports:
-  - port: 5678
+    - name: app-1
+      image: hashicorp/http-echo:0.2.3
+      args:
+        - "-text=Executando APP-1"
 
 ---
 
@@ -33,10 +21,22 @@ metadata:
     app: app-2
 spec:
   containers:
-  - name: app-2
-    image: hashicorp/http-echo:0.2.3
-    args:
-    - "-text=Executando APP-2"
+    - name: app-2
+      image: hashicorp/http-echo:0.2.3
+      args:
+        - "-text=Executando APP-2"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: app1-service
+spec:
+  selector:
+    app: app-1
+  ports:
+    - port: 5678
 
 ---
 
@@ -48,8 +48,7 @@ spec:
   selector:
     app: app-2
   ports:
-  - port: 5678
-
+    - port: 5678
 
 ---
 
@@ -59,20 +58,20 @@ metadata:
   name: example-ingress
 spec:
   rules:
-  - http:
-      paths:
-      - pathType: Prefix
-        path: "/app1"
-      backend:
-        service:
-          name: app1-service
-          port:
-            number: 5678
-      - pathType: Prefix
-        path: "/app2"
+    - http:
+        paths:
+          - pathType: Prefix
+            path: "/app1"
         backend:
           service:
-            name: app2-service
+            name: app1-service
             port:
-            number: 5678
+              number: 5678
+            - pathType: Prefix
+              path: "/app2"
+              backend:
+                service:
+                  name: app2-service
+                  port:
+                  number: 5678
 
